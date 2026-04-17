@@ -1,38 +1,41 @@
-const apiKey = "96408ebb7ddb487ea3a0b7df3e77e71a";
-
 const slidesContainer = document.getElementById("slides");
 
 let currentIndex = 0;
 let slides = [];
 
-fetch(`https://newsapi.org/v2/everything?q=ufc OR mma&language=en&sortBy=publishedAt&pageSize=10&apiKey=${apiKey}`)
-.then(res => res.json())
-.then(data => {
+if (slidesContainer) {
 
-  if (data.status !== "ok") return;
+  fetch("/api/news")
+    .then(res => res.json())
+    .then(data => {
 
-  // 🧠 نفلتر الأخبار اللي فيها صور بس
-  slides = data.articles.filter(a => a.urlToImage);
+      slides = (data.items || []).filter(a => a.title);
 
-  slides.forEach(article => {
-    const slide = document.createElement("a");
-    slide.href = article.url;
-    slide.target = "_blank";
-    slide.className = "slide";
+      slides.forEach(article => {
 
-    slide.innerHTML = `
-      <img src="${article.urlToImage}">
-      <div class="slide-title">${article.title}</div>
-    `;
+        const image = article.thumbnail || "https://via.placeholder.com/400";
 
-    slidesContainer.appendChild(slide);
-  });
+        const slide = document.createElement("a");
+        slide.href = article.link;
+        slide.target = "_blank";
+        slide.className = "slide";
 
-  startSlider();
-});
+        slide.innerHTML = `
+          <img src="${image}">
+          <div class="slide-title">${article.title}</div>
+        `;
+
+        slidesContainer.appendChild(slide);
+      });
+
+      startSlider();
+    });
+
+}
 
 function startSlider() {
   setInterval(() => {
+    if (!slides.length) return;
     currentIndex = (currentIndex + 1) % slides.length;
     slidesContainer.style.transform = `translateX(-${currentIndex * 100}%)`;
   }, 4000);

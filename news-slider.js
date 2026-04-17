@@ -1,27 +1,31 @@
-const apiKey = "96408ebb7ddb487ea3a0b7df3e77e71a";
+const slider = document.getElementById("news-slider");
 
-fetch(`https://newsapi.org/v2/everything?q=ufc OR mma&language=en&sortBy=publishedAt&pageSize=10&apiKey=${apiKey}`)
-.then(res => res.json())
-.then(data => {
+if (slider) {
 
-  const slider = document.getElementById("news-slider");
+  fetch("/api/news")
+    .then(res => res.json())
+    .then(data => {
 
-  data.articles.forEach(article => {
+      const articles = data.items || [];
 
-    if (!article.urlToImage) return;
+      articles.forEach(article => {
 
-    const item = document.createElement("a");
-    item.href = article.url;
-    item.target = "_blank";
-    item.className = "slide";
+        const image = article.thumbnail || "https://via.placeholder.com/400";
 
-    item.innerHTML = `
-      <img src="${article.urlToImage}">
-      <div class="slide-title">${article.title}</div>
-    `;
+        const item = document.createElement("a");
+        item.href = article.link;
+        item.target = "_blank";
+        item.className = "slide";
 
-    slider.appendChild(item);
+        item.innerHTML = `
+          <img src="${image}">
+          <div class="slide-title">${article.title}</div>
+        `;
 
-  });
+        slider.appendChild(item);
 
-});
+      });
+
+    });
+
+}
