@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Admin Panel</title>
+<link rel="stylesheet" href="style.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2709588519078306"
+     crossorigin="anonymous"></script>
+</head>
+
+<body>
+
+<div class="admin-container">
+
+  <h2>🛠 Admin Panel</h2>
+
+  <h3>📰 Add News</h3>
+
+  <input type="text" id="title" placeholder="News Title">
+  <input type="text" id="image" placeholder="Image URL">
+  <input type="text" id="link" placeholder="News Link">
+
+  <button onclick="addNews()">Add News</button>
+
+  <hr>
+
+  <h3>🔴 Live Control</h3>
+
+  <input type="text" id="liveLink" placeholder="Live Stream Link">
+
+  <select id="liveStatus">
+    <option value="off">OFF</option>
+    <option value="on">ON</option>
+  </select>
+
+  <button onclick="updateLive()">Update Live</button>
+
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, addDoc, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA04-mZ_1Ptqwur9SW3WSCLpSOplQIHEU4",
+  authDomain: "mma-live-bc4ab.firebaseapp.com",
+  projectId: "mma-live-bc4ab",
+  storageBucket: "mma-live-bc4ab.firebasestorage.app",
+  messagingSenderId: "512983717218",
+  appId: "1:512983717218:web:f9a597d29731700049483b"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+/* 📰 إضافة خبر */
+window.addNews = async function() {
+
+  const title = document.getElementById("title").value;
+  const image = document.getElementById("image").value;
+  const link = document.getElementById("link").value;
+
+  await addDoc(collection(db, "news"), {
+    title,
+    image,
+    link
+  });
+
+  alert("✅ News Added!");
+}
+
+/* 🔴 التحكم في اللايف */
+window.updateLive = async function() {
+
+  const link = document.getElementById("liveLink").value;
+  const status = document.getElementById("liveStatus").value;
+
+  await setDoc(doc(db, "live", "current"), {
+    link: link,
+    status: status
+  });
+
+  alert("✅ Live Updated!");
+}
+</script>
+
+</body>
+</html>
