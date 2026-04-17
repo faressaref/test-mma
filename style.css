@@ -429,10 +429,11 @@ body {
 
   /* 🔝 Navbar */
   .navbar {
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px;
+}
 
   /* 🧱 Layout */
   .main-layout {
@@ -552,4 +553,8 @@ body {
 }
 .side-menu {
   z-index: 1000;
+}
+.logo img {
+  height: 150px;
+  display: block;
 }
