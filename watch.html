@@ -3,150 +3,137 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2709588519078306"
-     crossorigin="anonymous"></script>
-<title>Watch Live</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FightSphere Live</title>
+
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+
 <style>
 body {
-  background: #121212;
   margin: 0;
-  font-family: Arial;
+  background: #000;
+  font-family: Arial, sans-serif;
+}
+
+/* 🔴 عنوان */
+.title {
   color: white;
+  text-align: center;
+  margin-top: 15px;
+  font-size: 20px;
 }
 
-/* 🎬 Player */
-.player-container {
-  max-width: 900px;
-  margin: 100px auto;
-  padding: 10px;
-}
-
+/* 🎬 المشغل */
 .player {
+  width: 100%;
+  max-width: 900px;
+  margin: 20px auto;
   position: relative;
-  width: 100%;
-  background: black;
-  border-radius: 15px;
-  overflow: hidden;
-  box-shadow: 0 0 30px rgba(255, 59, 59, 0.2);
 }
 
-.player iframe {
+video {
   width: 100%;
-  height: 500px;
-  border: none;
+  border-radius: 10px;
 }
 
-/* 🎮 Controls */
-.controls {
+/* ⏳ loading */
+.loading {
   position: absolute;
-  bottom: 10px;
-  right: 10px;
-}
-
-.controls button {
-  background: rgba(0,0,0,0.6);
-  border: none;
-  color: white;
-  padding: 10px;
-  border-radius: 8px;
-  cursor: pointer;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #000;
+  color: #aaa;
   font-size: 16px;
 }
 
-/* 📱 موبايل */
-@media (max-width: 768px) {
-  .player iframe {
-    height: 250px;
-  }
-
-  .player-container {
-    margin: 60px auto;
-  }
+/* ⚠️ رسالة */
+.msg {
+  text-align: center;
+  color: #ccc;
+  margin-top: 15px;
+  font-size: 14px;
 }
 </style>
-
 </head>
 
 <body>
 
-<div class="player-container">
+<div class="title">🥊 UFC Live Stream</div>
 
-  <h2 style="text-align:center;margin-bottom:20px;">🔴 Live Stream</h2>
+<script>
+  atOptions = {
+    'key' : '478503ade892dc9dfa05f8ba60c21a46',
+    'format' : 'iframe',
+    'height' : 90,
+    'width' : 728,
+    'params' : {}
+  };
+</script>
 
-  <div class="player" id="playerBox">
+<script src="https://www.highperformanceformat.com/478503ade892dc9dfa05f8ba60c21a46/invoke.js"></script>
 
-    <!-- الفيديو -->
-    <iframe id="videoFrame" src="" allowfullscreen></iframe>
-
-    <!-- controls -->
-    <div class="controls">
-      <button onclick="goFull()">⛶</button>
-    </div>
-
-  </div>
-
+<div class="player">
+  <div class="loading" id="loading">Loading stream...</div>
+  <video id="video" controls autoplay playsinline></video>
 </div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+<div class="msg" id="msg"></div>
 
-const firebaseConfig = {
-  apiKey: "AIzaSyA04-mZ_1Ptqwur9SW3WSCLpSOplQIHEU4",
-  authDomain: "mma-live-bc4ab.firebaseapp.com",
-  projectId: "mma-live-bc4ab"
-};
+<script>
+const video = document.getElementById('video');
+const loading = document.getElementById('loading');
+const msg = document.getElementById('msg');
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+/* 🔥 UFC m3u8 */
+const url = " https://server1.musical.uz/setanta1_web/index.m3u8?token=8eddff6c6f16088742b75428bd7a3840df992ece-4d774432fc1393a2d6b676fb0ecb8f4c-1776637409-1776626609&remote=102.185.179.66";
+if (Hls.isSupported()) {
+  const hls = new Hls({
+    maxBufferLength: 30
+  });
 
-async function loadStream() {
-  try {
-    const snap = await getDoc(doc(db, "live", "current"));
+  hls.loadSource(url);
+  hls.attachMedia(video);
 
-    if (snap.exists()) {
-      const data = snap.data();
+  hls.on(Hls.Events.MANIFEST_PARSED, () => {
+    video.play();
+  });
 
-      // ❌ لو مفيش بث
-      if (data.status !== "on" || !data.link) {
-        window.location.href = "no-stream.html";
-        return;
-      }
-
-      // ✅ لو في بث
-      document.getElementById("videoFrame").src = data.link;
-
-    } else {
-      window.location.href = "no-stream.html";
+  hls.on(Hls.Events.ERROR, (event, data) => {
+    if (data.fatal) {
+      msg.innerText = "❌ Stream failed or blocked";
+      loading.style.display = "none";
     }
+  });
 
-  } catch (error) {
-    console.log(error);
-    window.location.href = "no-stream.html";
-  }
+} else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+  video.src = url;
 }
 
-loadStream();
+/* hide loading */
+video.addEventListener('loadeddata', () => {
+  loading.style.display = "none";
+});
 
-// 🔥 Fullscreen
-window.goFull = function () {
-  const player = document.getElementById("playerBox");
-
-  if (player.requestFullscreen) {
-    player.requestFullscreen();
+/* fallback */
+setTimeout(() => {
+  loading.style.display = "none";
+  if (!video.currentTime) {
+    msg.innerText = "⚠️ لو مش شغال جرب VPN أو غير السيرفر";
   }
-};
+}, 6000);
 </script>
-<div class="bottom-nav">
+<script>
+  atOptions = {
+    'key' : '58c750ca56ab52214c6b9b13847fb386',
+    'format' : 'iframe',
+    'height' : 60,
+    'width' : 468,
+    'params' : {}
+  };
+</script>
+<script src="https://www.highperformanceformat.com/58c750ca56ab52214c6b9b13847fb386/invoke.js"></script>
 
-  <a href="index.html">🏠<br>Home</a>
-  <a href="live.html">🔴<br>Live</a>
-  <a href="event.html">🥊<br>UFC</a>
-  <a href="pfl.html">🥊<br>PFL</a>
-  <a href="recorded.html">🎬<br>Rec</a>
-
-</div>
 <script src="https://pl29177538.profitablecpmratenetwork.com/da/55/89/da55898446ec966b226be60f4778fa33.js"></script>
 
 </body>
