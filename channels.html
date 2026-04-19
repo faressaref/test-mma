@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Choose Channel</title>
+
+<style>
+body {
+  margin: 0;
+  background: #000;
+  font-family: Arial;
+  color: white;
+}
+
+/* title */
+.title {
+  text-align: center;
+  margin: 25px 0;
+  font-size: 24px;
+}
+
+/* center */
+.wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+/* grid */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 20px;
+  width: 90%;
+  max-width: 800px;
+}
+
+/* card */
+.card {
+  background: #111;
+  border-radius: 16px;
+  padding: 25px;
+  text-align: center;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.card:hover {
+  background: #1a1a1a;
+  transform: scale(1.08);
+}
+
+.card img {
+  width: 90px;
+  margin-bottom: 10px;
+}
+
+.card span {
+  font-size: 14px;
+}
+
+.back {
+  text-align: center;
+  margin: 20px;
+  display: block;
+  color: #aaa;
+  text-decoration: none;
+}
+</style>
+</head>
+
+<body>
+
+<div class="title">📺 Choose Channel</div>
+
+<div class="wrapper">
+  <div class="grid">
+
+    <div class="card" onclick="go('espn')">
+      <img src="https://a.espncdn.com/watchespn/images/web/network_logos/channel_logo_espn_2x.png">
+      <span>ESPN</span>
+    </div>
+
+    <div class="card" onclick="go('espn8')">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/a/a1/ESPN8_The_Ocho_ESPN_Organization_Logo.svg">
+      <span>ESPN 8</span>
+    </div>
+
+    <div class="card" onclick="go('ufc')">
+      <img src="UFC.png">
+      <span>UFC</span>
+    </div>
+
+    <div class="card" onclick="go('pfl')">
+      <img src="https://image.roku.com/bh-uploads/production/infoHUDLogo/1746567430962_PFL_260x147_Logo_Center.png">
+      <span>PFL</span>
+    </div>
+
+    <div class="card" onclick="go('nbc')">
+      <img src="nbc.png">
+      <span>NBC Sports</span>
+    </div>
+
+    <div class="card" onclick="go('fubo')">
+      <img src="https://github.com/tv-logo/tv-logos/blob/main/countries/united-states/fubo-sports-network-us.png?raw=true">
+      <span>Fubo Sports</span>
+    </div>
+
+    <div class="card" onclick="go('cbs')">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/CBS_Sports_Network_2021.svg">
+      <span>CBS Sports</span>
+    </div>
+
+    <div class="card" onclick="go('nba')">
+      <img src="https://upload.wikimedia.org/wikipedia/en/d/d2/NBA_TV.svg">
+      <span>NBA TV</span>
+    </div>
+
+ <div class="card" onclick="go('tanta')">
+      <img src="SETANTA.png">
+      <span>SETANTA SPORTS1</span>
+    </div>
+
+  </div>
+</div>
+
+<a href="live.html" class="back">⬅ Back</a>
+
+<script>
+function go(ch) {
+  window.location.href = "watch.html?ch=" + ch;
+}
+</script>
+
+</body>
+</html>
