@@ -10,54 +10,132 @@
 <style>
 body {
   margin: 0;
-  background: #000;
-  font-family: Arial, sans-serif;
-}
-
-.title {
+  background: #0b0b0b;
+  font-family: Arial;
   color: white;
-  text-align: center;
-  margin-top: 15px;
-  font-size: 20px;
+  padding-bottom: 70px;
 }
 
-.player {
+/* ☰ */
+.menu-btn {
+  position: fixed;
+  top: 15px;
+  right: 15px;
+  font-size: 24px;
+  background: #111;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  z-index: 1002;
+}
+
+.side-menu {
+  position: fixed;
+  top: 0;
+  right: -260px;
+  width: 220px;
+  height: 100%;
+  background: #111;
+  padding-top: 60px;
+  transition: right 0.3s ease;
+  z-index: 1002;
+}
+
+.side-menu.open {
+  right: 0;
+}
+
+.side-menu a {
+  display: block;
+  padding: 14px;
+  color: white;
+  text-decoration: none;
+}
+
+/* overlay */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
   width: 100%;
-  max-width: 900px;
-  margin: 20px auto;
-  position: relative;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  opacity: 0;
+  pointer-events: none;
+  transition: 0.3s;
+  z-index: 1001;
+}
+
+.overlay.show {
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* title */
+.title {
+  text-align: center;
+  margin: 20px 0;
+  font-size: 22px;
+}
+
+/* player */
+.player-container {
+  width: 100%;
+  max-width: 700px;
+  margin: 30px auto 80px;
+  text-align: center;
 }
 
 video {
   width: 100%;
-  border-radius: 10px;
+  border-radius: 12px;
 }
 
-.loading {
-  position: absolute;
-  inset: 0;
+/* 📱 */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background: #111;
   display: flex;
-  justify-content: center;
-  align-items: center;
-  background: #000;
-  color: #aaa;
-  font-size: 16px;
+  justify-content: space-around;
+  padding: 8px 0;
+  z-index: 1000;
 }
 
-.msg {
-  text-align: center;
-  color: #ccc;
-  margin-top: 15px;
+@media (min-width: 768px) {
+  .bottom-nav {
+    display: none;
+  }
+}
+
+.bottom-nav a {
+  color: white;
+  text-decoration: none;
   font-size: 14px;
+  text-align: center;
 }
 </style>
 </head>
 
 <body>
 
+<!-- ☰ -->
+<div class="menu-btn" onclick="toggleMenu()">☰</div>
+
+<div class="side-menu" id="sideMenu">
+  <a href="index.html">🏠 Home</a>
+  <a href="live.html">🔴 Live</a>
+  <a href="event.html">🥊 UFC</a>
+  <a href="pfl.html">🥊 PFL</a>
+  <a href="recorded.html">🎬 Recorded</a>
+</div>
+
+<div class="overlay" id="overlay" onclick="closeMenu()"></div>
+
 <div class="title" id="title">🔴 Loading...</div>
 
-<!-- 🔥 Ad فوق -->
+<!-- 🔥 إعلان فوق -->
 <div style="text-align:center;">
 <script>
   atOptions = {
@@ -71,101 +149,12 @@ video {
 <script src="https://www.highperformanceformat.com/478503ade892dc9dfa05f8ba60c21a46/invoke.js"></script>
 </div>
 
-<div class="player">
-  <div class="loading" id="loading">Loading stream...</div>
+<!-- 🎬 المشغل -->
+<div class="player-container">
   <video id="video" controls autoplay playsinline></video>
 </div>
 
-<div class="msg" id="msg"></div>
-
-<script>
-const params = new URLSearchParams(window.location.search);
-const ch = params.get("ch");
-
-let url = "";
-
-/* channels */
-
-if (ch === "espn") {
-  url = "http://41.205.93.154/ESPN/index.m3u8";
-}
-
-else if (ch === "espn8") {
-  url = "https://d3b6q2ou5kp8ke.cloudfront.net/v1/manifest/3722c60a815c199d9c0ef36c5b73da68a62b09d1/cc-vz67vw1bljinm/aab88f58-adb6-4466-aceb-3b71a6f23411/4.m3u8";
-}
-
-else if (ch === "ufc") {
-  url = "https://dbrb49pjoymg4.cloudfront.net/manifest/3fec3e5cac39a52b2132f9c66c83dae043dc17d4/prod_default_xumo-ams-aws/194a140c-0cf5-443e-b747-08bf621d75a8/0.m3u8";
-}
-
-else if (ch === "pfl") {
-  url = "https://aka-live1050.delivery.roku.com/120da388-708f-4b8f-b4f4-8d564c348eb1/t2-origin/out/v1/live_1080.m3u8";
-}
-
-else if (ch === "nbc") {
-  url = "https://d4whmvwm0rdvi.cloudfront.net/manifest/3fec3e5cac39a52b2132f9c66c83dae043dc17d4/prod_default_xumo-nbcu-linear/9ed59304-2f35-4c88-9b99-34153edef42b/4.m3u8";
-}
-
-else if (ch === "fubo") {
-  url = "https://dnf08l6u6uxnz.cloudfront.net/v1/manifest/3722c60a815c199d9c0ef36c5b73da68a62b09d1/cc-nwrh2vjyudfjo/5999cb1e-489e-434e-b70a-755f69ec828e/5.m3u8";
-}
-
-else if (ch === "cbs") {
-  url = "https://dai.google.com/linear/hls/event/Sid4xiTQTkCT1SLu6rjUSQ/master.m3u8";
-}
-
-else if (ch === "nba") {
-  url = "http://212.102.60.231/NBA_TV/index.m3u8";
-}
-else if (ch === "tanta") {
-  url = "https://server.musical.uz/setanta1_web/tracks-v1a1/mono.m3u8?remote=102.185.179.66&token=f7162fb192cf9f18464619f59282a71e63265ccc-98918376bedb8a616ff492c93a7325b5-1776644847-1776634047";
-}
-/* لو مفيش اختيار */
-else {
-  title.innerText = "❌ No Channel Selected";
-  msg.innerText = "ارجع واختار قناة";
-}
-
-/* تشغيل */
-if (url) {
-
-  if (Hls.isSupported()) {
-    const hls = new Hls({ maxBufferLength: 30 });
-    hls.loadSource(url);
-    hls.attachMedia(video);
-
-    hls.on(Hls.Events.MANIFEST_PARSED, () => {
-      video.play();
-    });
-
-    hls.on(Hls.Events.ERROR, (event, data) => {
-      if (data.fatal) {
-        msg.innerText = "❌ Stream failed or blocked";
-        loading.style.display = "none";
-      }
-    });
-
-  } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-    video.src = url;
-  }
-
-}
-
-/* hide loading */
-video.addEventListener('loadeddata', () => {
-  loading.style.display = "none";
-});
-
-/* fallback */
-setTimeout(() => {
-  loading.style.display = "none";
-  if (!video.currentTime) {
-    msg.innerText = "⚠️ لو مش شغال جرب VPN أو غير السيرفر";
-  }
-}, 6000);
-</script>
-
-<!-- 🔥 Ad تحت -->
+<!-- 🔥 إعلان تحت -->
 <div style="text-align:center;">
 <script>
   atOptions = {
@@ -179,7 +168,82 @@ setTimeout(() => {
 <script src="https://www.highperformanceformat.com/58c750ca56ab52214c6b9b13847fb386/invoke.js"></script>
 </div>
 
-<!-- 💣 Pop -->
+<!-- 📱 -->
+<div class="bottom-nav">
+  <a href="index.html">🏠<br>Home</a>
+  <a href="live.html">🔴<br>Live</a>
+  <a href="event.html">🥊<br>UFC</a>
+  <a href="pfl.html">🥊<br>PFL</a>
+  <a href="recorded.html">🎬<br>Rec</a>
+</div>
+
+<script>
+function toggleMenu() {
+  const menu = document.getElementById("sideMenu");
+  const overlay = document.getElementById("overlay");
+  menu.classList.toggle("open");
+  overlay.classList.toggle("show");
+}
+
+function closeMenu() {
+  document.getElementById("sideMenu").classList.remove("open");
+  document.getElementById("overlay").classList.remove("show");
+}
+
+/* PLAYER */
+const params = new URLSearchParams(window.location.search);
+const ch = params.get("ch");
+
+const video = document.getElementById("video");
+const title = document.getElementById("title");
+
+let url = "";
+
+if (ch === "espn") {
+  url = "http://41.205.93.154/ESPN/index.m3u8";
+  title.innerText = "📺 ESPN";
+}
+else if (ch === "espn8") {
+  url = "https://d3b6q2ou5kp8ke.cloudfront.net/v1/manifest/3722c60a815c199d9c0ef36c5b73da68a62b09d1/cc-vz67vw1bljinm/aab88f58-adb6-4466-aceb-3b71a6f23411/4.m3u8";
+  title.innerText = "📺 ESPN 8";
+}
+else if (ch === "ufc") {
+  url = "https://dbrb49pjoymg4.cloudfront.net/manifest/3fec3e5cac39a52b2132f9c66c83dae043dc17d4/prod_default_xumo-ams-aws/194a140c-0cf5-443e-b747-08bf621d75a8/0.m3u8";
+  title.innerText = "🥊 UFC";
+}
+else if (ch === "pfl") {
+  url = "https://aka-live1050.delivery.roku.com/120da388-708f-4b8f-b4f4-8d564c348eb1/t2-origin/out/v1/live_1080.m3u8";
+  title.innerText = "🥊 PFL";
+}
+else if (ch === "nbc") {
+  url = "https://d4whmvwm0rdvi.cloudfront.net/manifest/3fec3e5cac39a52b2132f9c66c83dae043dc17d4/prod_default_xumo-nbcu-linear/9ed59304-2f35-4c88-9b99-34153edef42b/4.m3u8";
+  title.innerText = "📺 NBC Sports";
+}
+else if (ch === "fubo") {
+  url = "https://dnf08l6u6uxnz.cloudfront.net/v1/manifest/3722c60a815c199d9c0ef36c5b73da68a62b09d1/cc-nwrh2vjyudfjo/5999cb1e-489e-434e-b70a-755f69ec828e/5.m3u8";
+  title.innerText = "📺 Fubo Sports";
+}
+else if (ch === "cbs") {
+  url = "https://dai.google.com/linear/hls/event/Sid4xiTQTkCT1SLu6rjUSQ/master.m3u8";
+  title.innerText = "📺 CBS Sports";
+}
+else if (ch === "nba") {
+  url = "http://212.102.60.231/NBA_TV/index.m3u8";
+  title.innerText = "🏀 NBA TV";
+}
+
+if (url) {
+  if (Hls.isSupported()) {
+    const hls = new Hls();
+    hls.loadSource(url);
+    hls.attachMedia(video);
+  } else {
+    video.src = url;
+  }
+}
+</script>
+
+<!-- 💣 Pop Ad -->
 <script src="https://pl29177538.profitablecpmratenetwork.com/da/55/89/da55898446ec966b226be60f4778fa33.js"></script>
 
 </body>
