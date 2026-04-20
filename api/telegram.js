@@ -1,7 +1,7 @@
 export default async function handler(req, res) {
 
   const TOKEN = process.env.TELEGRAM_TOKEN;
-  const CHAT_ID = "1105509747";
+  const CHAT_ID = "@fightsphere"; 
 
   const text = req.query.text || "🔥 FightSphere Update";
 
