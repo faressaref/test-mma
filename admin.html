@@ -2,86 +2,123 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Admin Panel</title>
-<link rel="stylesheet" href="style.css">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2709588519078306"
-     crossorigin="anonymous"></script>
+<title>Admin Panel</title>
+
+<style>
+body {
+  background: #0b0b0b;
+  color: white;
+  font-family: Arial;
+  text-align: center;
+  padding: 20px;
+}
+
+.box {
+  max-width: 400px;
+  margin: auto;
+  background: #111;
+  padding: 20px;
+  border-radius: 12px;
+}
+
+input, button {
+  width: 100%;
+  margin: 10px 0;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+}
+
+button {
+  background: red;
+  color: white;
+  cursor: pointer;
+}
+
+button:hover {
+  background: darkred;
+}
+</style>
 </head>
 
 <body>
 
-<div class="admin-container">
+<div id="loginBox" class="box">
+  <h2>🔐 Admin Login</h2>
+  <input type="password" id="password" placeholder="Enter Password">
+  <button onclick="login()">Login</button>
+</div>
 
-  <h2>🛠 Admin Panel</h2>
+<div id="panel" class="box" style="display:none;">
+  <h2>⚙️ Admin Panel</h2>
 
   <h3>📰 Add News</h3>
+  <input id="newsTitle" placeholder="News Title">
+  <button onclick="addNews()">Publish News</button>
 
-  <input type="text" id="title" placeholder="News Title">
-  <input type="text" id="image" placeholder="Image URL">
-  <input type="text" id="link" placeholder="News Link">
-
-  <button onclick="addNews()">Add News</button>
-
-  <hr>
-
-  <h3>🔴 Live Control</h3>
-
-  <input type="text" id="liveLink" placeholder="Live Stream Link">
-
-  <select id="liveStatus">
-    <option value="off">OFF</option>
-    <option value="on">ON</option>
-  </select>
-
-  <button onclick="updateLive()">Update Live</button>
+  <h3>🔴 Go Live</h3>
+  <input id="eventName" placeholder="Event Name (UFC 300)">
+  <input id="channelName" placeholder="Channel Name (ESPN)">
+  <input id="channelId" placeholder="Channel ID (espn)">
+  <button onclick="sendLive()">Send Live</button>
 
 </div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, addDoc, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+<script>
+const PASSWORD = "1234"; // غيره
 
-const firebaseConfig = {
-  apiKey: "AIzaSyA04-mZ_1Ptqwur9SW3WSCLpSOplQIHEU4",
-  authDomain: "mma-live-bc4ab.firebaseapp.com",
-  projectId: "mma-live-bc4ab",
-  storageBucket: "mma-live-bc4ab.firebasestorage.app",
-  messagingSenderId: "512983717218",
-  appId: "1:512983717218:web:f9a597d29731700049483b"
-};
+function login() {
+  const pass = document.getElementById("password").value;
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-/* 📰 إضافة خبر */
-window.addNews = async function() {
-
-  const title = document.getElementById("title").value;
-  const image = document.getElementById("image").value;
-  const link = document.getElementById("link").value;
-
-  await addDoc(collection(db, "news"), {
-    title,
-    image,
-    link
-  });
-
-  alert("✅ News Added!");
+  if (pass === PASSWORD) {
+    document.getElementById("loginBox").style.display = "none";
+    document.getElementById("panel").style.display = "block";
+  } else {
+    alert("Wrong password");
+  }
 }
 
-/* 🔴 التحكم في اللايف */
-window.updateLive = async function() {
+// 📰 خبر
+async function addNews() {
+  const title = document.getElementById("newsTitle").value;
 
-  const link = document.getElementById("liveLink").value;
-  const status = document.getElementById("liveStatus").value;
+  if (!title) return alert("Enter title");
 
-  await setDoc(doc(db, "live", "current"), {
-    link: link,
-    status: status
-  });
+  await fetch("/api/telegram?text=" + encodeURIComponent(`
+📰 <b>New Update</b>
 
-  alert("✅ Live Updated!");
+${title}
+
+📖 Read:
+https://fightsphere.vercel.app/news.html
+`));
+
+  alert("News sent 🔥");
+}
+
+// 🔴 لايف
+async function sendLive() {
+
+  const eventName = document.getElementById("eventName").value;
+  const channelName = document.getElementById("channelName").value;
+  const channelId = document.getElementById("channelId").value;
+
+  if (!eventName || !channelId) return alert("Fill all fields");
+
+  const msg = `
+🔴 <b>LIVE NOW</b>
+
+🥊 ${eventName}
+📺 Channel: ${channelName}
+
+🔥 Watch:
+https://fightsphere.vercel.app/watch.html?ch=${channelId}
+`;
+
+  await fetch("/api/telegram?text=" + encodeURIComponent(msg));
+
+  alert("Live sent 🚀");
 }
 </script>
 
